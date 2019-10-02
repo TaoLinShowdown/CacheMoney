@@ -6,7 +6,11 @@ Copy Paste from https://www.securitee.org/teaching/cse331/projects/project2.html
 
 
 > CSE 331 -- Fall 2019
+
+
 > Project 2: Browser extension for detecting and reporting Tabnabbing Attacks
+
+
 > Tabnabbing is a form of phishing where malicious websites exploit the lack of focus of their website to completely change their look and feel to imitate the log-in page of a benign site. The key idea of tabnabbing is that users are trained to carefully inspect a website when they first open it, but once it's open, it is lost in a "sea of tabs". When users come back to the open site (that now may look like the login page of Paypal or GMail) they do not inspect the browser URL but assume that Gmail/Paypal has logged them out and proceed to log-in again, thereby leaking their credentials to the attacker.
 
 You can see a video of the attack here and read more about it here (at the time of this writing, this link tries to demonstrate the attack when you lose focus but fails because of a non-existing image. You can read the entire thing as long as you don't switch tabs/windows while you are doing it.)
