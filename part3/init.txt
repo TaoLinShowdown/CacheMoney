@@ -1,0 +1,3 @@
+Install node.js
+If it doesn't work, delete node_modules and use this guide to fix app.js: https://www.thepolyglotdeveloper.com/2018/09/developing-restful-api-nodejs-mongodb-atlas/
+Start the server with 'npm start' in the directory app.js is in
