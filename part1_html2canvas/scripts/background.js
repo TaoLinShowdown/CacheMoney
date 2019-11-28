@@ -1,21 +1,7 @@
 var tabDataStore = {};
+var interval = 3000;
 
-// WHEN A TAB IS REMOVED, WE REMOVE IT FROM tabDataStore
-chrome.tabs.onRemoved.addListener(function(tabId, changeInfo, tab) {
-    delete tabDataStore['tab_' + tabId];
-    // console.table(tabDataStore);
-});
-
-// WHEN A TAB GAINS FOCUS, A MANUAL SCREENSHOT IS TAKEN
-// chrome.tabs.onActivated.addListener(function(activeInfo) {
-//     if(tabDataStore['tab_' + activeInfo.tabId].img !== undefined) {
-//         chrome.tabs.captureVisibleTab(null, {}, function(dataURL) {
-//             tabDataStore['tab_' + activeInfo.tabId].newImg = dataURL;
-//             // console.table(tabDataStore);
-//         });
-//     }
-// });
-
+// THE MAIN PART WHERE WE TAKE A SNAPSHOT EVERY COUPLE SECONDS AND STORE IT LOCALLY
 var t = setInterval(function() {
     chrome.tabs.query({active: true, status: "complete"}, function(tabs) {
         // LOOPING THROUGH EVERY ACTIVE AND COMPLETELY LOADED TAB
@@ -45,4 +31,15 @@ var t = setInterval(function() {
             }
         });
     });
-}, 1000);
+}, interval);
+
+// WHEN A TAB IS REMOVED, WE REMOVE IT FROM tabDataStore
+chrome.tabs.onRemoved.addListener(function(tabId, changeInfo, tab) {
+    delete tabDataStore['tab_' + tabId];
+});
+
+// WHEN A TAB GAINS FOCUS, A MANUAL SCREENSHOT IS TAKEN AND WE COMPARE IT TO THE CURRENT STORED ONE THROUGH RESEMBLEJS
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+    console.log(activeInfo);
+    
+});
