@@ -51,7 +51,7 @@ var makeDialog = function() {
     dialog.style.fontFamily = "Calibri";
     dialog.style.fontSize = "11px";
     dialog.style.textAlign = "center";
-    dialog.innerHTML = "CacheMoney detected changes in <br> this tab which are highlighed in red <br> Would you like to report this website?";
+    dialog.innerHTML = "CacheMoney detected changes in <br> this tab which are highlighted in red <br> Would you like to report this website?";
 
     var buttonsContainer = document.createElement("div");
     var closeButton = document.createElement("button");
@@ -67,7 +67,10 @@ var makeDialog = function() {
         enableScroll();
         document.body.removeChild(document.getElementById('tabnab-overlay'));
         document.body.removeChild(document.getElementById('tabnab-dialog'));
-        console.log("URL of tab is: lol idk")
+
+        // THIS IS WHERE STORING THE URL COMES IN
+        var url = window.location.href;
+        console.log("URL of tab is: ", url)
     }
     buttonsContainer.style.padding = "3px";
     buttonsContainer.appendChild(closeButton);
@@ -78,7 +81,6 @@ var makeDialog = function() {
     return dialog;
 }
 
-console.log("content script loaded");
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponse({handshake: "Coords received"});
     
@@ -87,12 +89,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     var { coords } = request;
     changes = [];
     changes = [ ...coords ];
-    console.log("changes that were detected: ", changes);
+    console.log("detected changes: ", changes);
 
-    var overlay = makeOverlay();
-    var dialog = makeDialog();
-    document.body.appendChild(overlay);
-    document.body.appendChild(dialog);
+    if(!document.getElementById("tabnab-overlay"))
+        var overlay = makeOverlay();
+        var dialog = makeDialog();
+        document.body.appendChild(overlay);
+        document.body.appendChild(dialog);
 
     // COLORING IN THE BOXES THAT WE DETECTED CHANGE IN
     changes.forEach((coord) => {
@@ -102,7 +105,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // CODE FROM: https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
-//
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 var keys = {37: 1, 38: 1, 39: 1, 40: 1};
