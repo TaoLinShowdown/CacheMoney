@@ -35,22 +35,24 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     if(tabDataStore['tab_' + tabId] !== undefined) {
         if(tabDataStore['tab_' + tabId].img !== undefined) {
             chrome.tabs.captureVisibleTab(null, {format: "png"}, function(dataURL) {
+                var oldImg = tabDataStore['tab_' + tabId];
+                var newImg = dataURL;
+
                 // COMPARE THE TWO IMAGES, IF CHANGES DETECTED, CONTENT SCRIPT
-                chrome.runtime.addListener(function(request, sender, sendResponse) {
-                    var { img1, img2 } = request;
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("POST", "http://54.234.84.123:3000/resemble", true);
-                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                    xhr.onreadystatechange = function() {
-                        if(xhr.readyState == 4 && xhr.status == 200){
-                            console.log("image 1:" + img1);
-                            console.log("image 2:" + img2);
-                        }
-                    }
-                    xhr.send("img1=" + img1 +"&img2="+ img2);
-                    sendResponse({response: "HTTP SENT"})
-                });
-                if(testcoords !== []){
+                // var xhr = new XMLHttpRequest();
+                // xhr.open("POST", "http://54.234.84.123:3000/resemble", true);
+                // xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                // xhr.onreadystatechange = function() {
+                //     if(xhr.readyState == 4 && xhr.status == 200){
+                //         console.log("image 1:" + img1.substring(0, 6) + "...");
+                //         console.log("image 2:" + img2.substring(0, 6) + "...");
+                //     }
+                // }
+                // xhr.send("img1=" + oldImg +"&img2="+ newImg);
+
+                
+                testcoords = [];
+                if(testcoords != false){
                     // TAKE THE ARRAY OF COORDS WHERE WE DETECT CHANGE AND SEND A MESSAGE TO CONTENT SCRIPT TO BUILD AND APPLY OVERLAY TO PAGE
                     chrome.tabs.sendMessage(tabId, {coords: testcoords}, function(response) {
                         console.log("Content script response: ", response.handshake);
