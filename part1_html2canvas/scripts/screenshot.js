@@ -69,8 +69,11 @@ var makeDialog = function() {
         document.body.removeChild(document.getElementById('tabnab-dialog'));
 
         // THIS IS WHERE STORING THE URL COMES IN
+        // SEND THE URL TO MONGODB CLUSTER
         var url = window.location.href;
         console.log("URL of tab is: ", url)
+
+        const uri = "mongodb+srv://Lin:WaDCu2e.GPwy3XN@cluster0-epco6.mongodb.net/test?retryWrites=true&w=majority";
     }
     buttonsContainer.style.padding = "3px";
     buttonsContainer.appendChild(closeButton);
@@ -91,11 +94,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     changes = [ ...coords ];
     console.log("detected changes: ", changes);
 
-    if(!document.getElementById("tabnab-overlay"))
+    if(!document.getElementById("tabnab-overlay")){
         var overlay = makeOverlay();
         var dialog = makeDialog();
         document.body.appendChild(overlay);
         document.body.appendChild(dialog);
+    }
 
     // COLORING IN THE BOXES THAT WE DETECTED CHANGE IN
     changes.forEach((coord) => {
