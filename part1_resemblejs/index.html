@@ -22,15 +22,16 @@
                         if (data['misMatchPercentage'] > 0) {
                             differentTiles.push([tiles[i][1], tiles[i][2]])
                         }
-                        if (i == tiles.length - 1)
+                        if (i == tiles.length - 1) {
                             console.log(differentTiles)
+                        }
                     });
                 }
             }
         }
         function splitImage(image) {
             var tiles = []
-            for (let i = 0; i < image.width; i += 10) {
+            for (let i = 0; i < image.width - 17; i += 10) {
                 for (let j = 0; j < image.height; j += 10) {
                     var canvas = document.createElement('canvas');
                     canvas.width = 10;
