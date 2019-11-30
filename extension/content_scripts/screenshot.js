@@ -1,6 +1,7 @@
-// MAKING THE OVERLAY THAT WILL HIGHLIGHT PARTS OF THE WEBPAGE THAT HAVE CHANGED
-var changes = [] // ARRAY OF COORDS WHERE CHANGES WERE DETECTED
-
+/****************************************************************************************
+ * Returns an overlay div element 
+ * Calculates number of 10px by 10px sections on the viewport and appends to the overlay div a 10px by 10px div for each
+ */
 var makeOverlay = function() {
     var overlay = document.createElement("div");
     overlay.id = "tabnab-overlay"
@@ -32,6 +33,9 @@ var makeOverlay = function() {
     return overlay;
 }
 
+/**************************************************************************************** 
+ * Returns a dialog with option to ignore overlay, or report the current url
+*/
 var makeDialog = function() {
     var dialog = document.createElement("div");
     dialog.id = "tabnab-dialog"
@@ -51,18 +55,19 @@ var makeDialog = function() {
     dialog.style.fontFamily = "Calibri";
     dialog.style.fontSize = "11px";
     dialog.style.textAlign = "center";
-    dialog.innerHTML = "CacheMoney detected changes in <br> this tab which are highlighted in red <br> Would you like to report this website?";
+    dialog.innerHTML = "CacheMoney detected changes in <br> this tab which are highlighted in red \
+                        <br> Would you like to report this website?";
 
     var buttonsContainer = document.createElement("div");
     var closeButton = document.createElement("button");
-    closeButton.innerHTML = "Close"
+    closeButton.innerHTML = "Close";
     closeButton.onclick = () => {
         enableScroll();
         document.body.removeChild(document.getElementById('tabnab-overlay'));
         document.body.removeChild(document.getElementById('tabnab-dialog'));
     }
     var submitButton = document.createElement("button");
-    submitButton.innerHTML = "Report"
+    submitButton.innerHTML = "Report";
     submitButton.onclick = () => {
         enableScroll();
         document.body.removeChild(document.getElementById('tabnab-overlay'));
@@ -71,7 +76,7 @@ var makeDialog = function() {
         // THIS IS WHERE STORING THE URL COMES IN
         // SEND THE URL TO MONGODB CLUSTER USING HTTPREQUEST
         var url = window.location.href.toString();
-        console.log("sending message");
+        console.log("REPORTING URL", url + "...");
         chrome.runtime.sendMessage({url: url}, function(response) {
             console.log(response);
         })
@@ -85,6 +90,12 @@ var makeDialog = function() {
     return dialog;
 }
 
+/****************************************************************************************
+ * On receiving a message from snapshotter.js that is RESEMBLE
+ * Request has two image dataurls
+ * If there is not already an overlay in the DOM, we disable scroll, and create and append to the body overlay and dialog
+ * Calls compareImages() on the two image dataurls from request
+ */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if(request.message === "RESEMBLE") {
         if(document.getElementById("tabnab-overlay") !== undefined){
@@ -105,6 +116,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } 
 });
 
+/**************************************************************************************** */
 // Takes two images' base64 code, outputs the resulting image, and runs splitImage
 // through the resulting image to get the coordinates
 function compareImages(image1base64, image2base64) {
@@ -148,6 +160,7 @@ function callback(image, ctx) {
     }
 }
 
+/**************************************************************************************** */
 // CODE FROM: https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
@@ -186,3 +199,5 @@ function enableScroll() {
     window.ontouchmove = null;  
     document.onkeydown = null;  
 }
+
+/**************************************************************************************** */
