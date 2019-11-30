@@ -10,7 +10,7 @@
     "content_scripts": [
         {
             "matches": ["*://*/*"],
-            "js": ["./content_scripts/screenshot.js"],
+            "js": ["./content_scripts/screenshot.js", "./background_scripts/resemble.min.js"],
             "run_at": "document_idle"
         }
     ],

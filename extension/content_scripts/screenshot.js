@@ -87,28 +87,147 @@ var makeDialog = function() {
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // console.log(request);
-    sendResponse({handshake: "Coords received"});
-    
-    disableScroll();
-    
-    var { coords } = request;
-    changes = [];
-    changes = [ ...coords ];
-    console.log("detected changes: ", changes);
+    if(request.message === "OVERLAY") {
+        sendResponse({handshake: "Coords received"});
+        disableScroll();
+        
+        var { coords } = request;
+        changes = [];
+        changes = [ ...coords ];
+        console.log("detected changes: ", changes);
 
-    if(!document.getElementById("tabnab-overlay")){
-        var overlay = makeOverlay();
-        var dialog = makeDialog();
-        document.body.appendChild(overlay);
-        document.body.appendChild(dialog);
-    }
+        if(!document.getElementById("tabnab-overlay")){
+            var overlay = makeOverlay();
+            var dialog = makeDialog();
+            document.body.appendChild(overlay);
+            document.body.appendChild(dialog);
+        }
 
-    // COLORING IN THE BOXES THAT WE DETECTED CHANGE IN
-    changes.forEach((coord) => {
-        var id = coord[0] + " " + coord[1];
-        document.getElementById(id).style.background = "rgba(224, 0, 0, 0.37)";
-    });
+        // COLORING IN THE BOXES THAT WE DETECTED CHANGE IN
+        changes.forEach((coord) => {
+            var id = coord[0] + " " + coord[1];
+            document.getElementById(id).style.background = "rgba(224, 0, 0, 0.37)";
+        });
+    } else if(request.message === "RESEMBLE") {
+        if(!document.getElementById("tabnab-overlay")){
+            sendResponse({handshake: "PLEASE WAIT A FEW MINUTES..."});
+            var { img1, img2 } = request;
+
+            disableScroll();
+            var image1 = new Image();
+            var image2 = new Image();
+            var images = [image1, image2];
+
+            // checking for both images to be loaded in SOURCE: https://stackoverflow.com/questions/3032299/checking-for-multiple-images-loaded
+            var imageCount = 2;
+            var imagesLoaded = 0;
+
+            for(var i=0; i<imageCount; i++){
+                images[i].onload = function(){
+                    imagesLoaded++;
+                    if(imagesLoaded == imageCount){
+                        allLoaded();
+                    }
+                }
+            }
+
+            function allLoaded(){
+                console.log("ALL IMAGES LOADED...");
+                var overlay = makeOverlay();
+                var dialog = makeDialog();
+                document.body.appendChild(overlay);
+                document.body.appendChild(dialog);
+                
+                var tiles = splitImage(image1);
+                var tiles2 = splitImage(image2);
+                var differentTiles = [];
+                for (let i = 0; i < tiles.length; i++) {
+                    var diff = resemble(tiles[i][0])
+                    .compareTo(tiles2[i][0])
+                    .ignoreColors()
+                    .onComplete(function(data) {
+                        if (data['misMatchPercentage'] > 0) {
+                            differentTiles.push([tiles[i][1], tiles[i][2]])
+                            document.getElementById(tiles[i][1] + " " + tiles[i][2]).style.background = "rgba(224, 0, 0, 0.37)";
+                            console.log("colored tile: " + tiles[i][1] + " " + tiles[i][2]);
+                        }
+                        if (i == tiles.length - 1) {
+                            console.log(differentTiles)
+                        }
+                    });
+                }
+            }
+
+            image1.src = img1;
+            image2.src = img2;
+        } else {
+            console.log("PLEASE ANSWER THE CURRENT PROMPT FIRST");
+        }
+    } 
 });
+
+// RESEMBLE CODE 
+function cmpImgs(image, image2, differentTiles) {
+    var tiles = splitImage(image)
+    var tiles2 = splitImage(image2)
+    for (let i = 0; i < tiles.length; i++) {
+        var diff = resemble(tiles[i][0])
+        .compareTo(tiles2[i][0])
+        .ignoreColors()
+        .onComplete(function(data) {
+            if (data['misMatchPercentage'] > 0) {
+                differentTiles.push([tiles[i][1], tiles[i][2]])
+            }
+            if (i == tiles.length - 1) {
+                console.log(differentTiles)
+            }
+        });
+    }
+}
+
+function compareImages(img1, img2) {
+    var image = new Image();
+    var image2 = new Image();
+    var differentTiles = []
+    image2.onload = function() {    
+        var tiles = splitImage(image)
+        var tiles2 = splitImage(image2)
+        for (let i = 0; i < tiles.length; i++) {
+            var diff = resemble(tiles[i][0])
+            .compareTo(tiles2[i][0])
+            .ignoreColors()
+            .onComplete(function(data) {
+                if (data['misMatchPercentage'] > 0) {
+                    differentTiles.push([tiles[i][1], tiles[i][2]])
+                }
+                if (i == tiles.length - 1) {
+                    console.log(differentTiles)
+                    
+                }
+            });
+        }
+    }
+    image.src = img1;
+    image2.src = img2;
+    return differentTiles;
+}
+
+function splitImage(image) {
+    var tiles = []
+    for (let i = 0; i < image.width - 17; i += 10) {
+            for (let j = 0; j < image.height; j += 10) {
+                console.log("blah");
+                var canvas = document.createElement('canvas');
+                canvas.width = 10;
+                canvas.height = 10;
+                var context = canvas.getContext('2d');
+                context.drawImage(image, i, j, 10, 10, 0, 0, canvas.width, canvas.height);
+                tiles.push([canvas.toDataURL(), j/10, i/10]);
+            }
+    }
+    return tiles;
+}
+
 
 // CODE FROM: https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
 // left: 37, up: 38, right: 39, down: 40,
@@ -148,3 +267,4 @@ function enableScroll() {
     window.ontouchmove = null;  
     document.onkeydown = null;  
 }
+
