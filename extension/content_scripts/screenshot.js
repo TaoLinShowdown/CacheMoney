@@ -86,34 +86,16 @@ var makeDialog = function() {
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    // console.log(request);
-    if(request.message === "OVERLAY") {
-        sendResponse({handshake: "Coords received"});
-        disableScroll();
-        
-        var { coords } = request;
-        changes = [];
-        changes = [ ...coords ];
-        console.log("detected changes: ", changes);
-
-        if(!document.getElementById("tabnab-overlay")){
-            var overlay = makeOverlay();
-            var dialog = makeDialog();
-            document.body.appendChild(overlay);
-            document.body.appendChild(dialog);
-        }
-
-        // COLORING IN THE BOXES THAT WE DETECTED CHANGE IN
-        changes.forEach((coord) => {
-            var id = coord[0] + " " + coord[1];
-            document.getElementById(id).style.background = "rgba(224, 0, 0, 0.37)";
-        });
-    } else if(request.message === "RESEMBLE") {
+    if(request.message === "RESEMBLE") {
         if(!document.getElementById("tabnab-overlay")){
             sendResponse({handshake: "PLEASE WAIT A FEW MINUTES..."});
             var { img1, img2 } = request;
 
             disableScroll();
+            var overlay = makeOverlay();
+            var dialog = makeDialog();
+            document.body.appendChild(overlay);
+            document.body.appendChild(dialog);
             var image1 = new Image();
             var image2 = new Image();
             var images = [image1, image2];
@@ -133,10 +115,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
             function allLoaded(){
                 console.log("ALL IMAGES LOADED...");
-                var overlay = makeOverlay();
-                var dialog = makeDialog();
-                document.body.appendChild(overlay);
-                document.body.appendChild(dialog);
                 
                 var tiles = splitImage(image1);
                 var tiles2 = splitImage(image2);
