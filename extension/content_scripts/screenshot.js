@@ -105,6 +105,49 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } 
 });
 
+// Takes two images' base64 code, outputs the resulting image, and runs splitImage
+// through the resulting image to get the coordinates
+function compareImages(image1base64, image2base64) {
+    resemble(image1base64)
+    .compareTo(image2base64)
+    .ignoreColors()
+    .onComplete(function(data) {
+        var output = data.getImageDataUrl();
+        splitImage(callback, output)
+    });
+}
+// Takes resulting image in base64 and creates image with it
+function splitImage(callback, base64Data) {
+    var image = new Image();
+    image.onload = function() {
+        callback(image);
+    }
+    image.src = base64Data;
+}
+// Parses through the resulting image looking for 10 by 10 pixels containing magenta,
+// indicating a mismatch, and returns tiles with those mismatches
+function callback(image, ctx) {
+    for (let i = 0; i < image.width - 17; i += 10) {
+        for (let j = 0; j < image.height; j += 10) {
+            var canvas = document.createElement('canvas');
+            canvas.width = 10;
+            canvas.height = 10;
+            var context = canvas.getContext('2d');
+            context.drawImage(image, i, j, 10, 10, 0, 0, canvas.width, canvas.height);
+            var pixels = context.getImageData(0, 0, canvas.width, canvas.height)
+            for (let k = 0; k < pixels['data'].length; k += 4) {
+                if (pixels['data'][k] == 255 && pixels['data'][k+1] == 0 && pixels['data'][k+2] == 255) {
+                    // tiles.push([j/10, i/10]);
+                    document.getElementById(j/10 + " " + i/10).style.background = "rgba(224, 0, 0, 0.37)";
+                    // console.log(j/10, i/10);
+                    // ctx.fillRect(i, j, 10, 10);
+                    break
+                }
+            }
+        }
+    }
+}
+
 // CODE FROM: https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
@@ -142,45 +185,4 @@ function enableScroll() {
     window.onwheel = null; 
     window.ontouchmove = null;  
     document.onkeydown = null;  
-}
-
-// Takes two images' base64 code, outputs the resulting image, and runs splitImage
-// through the resulting image to get the coordinates
-function compareImages(image1base64, image2base64) {
-    resemble(image1base64)
-    .compareTo(image2base64)
-    .ignoreColors()
-    .onComplete(function(data) {
-        var output = data.getImageDataUrl();
-        splitImage(callback, output)
-    });
-}
-// Takes resulting image in base64 and creates image with it
-function splitImage(callback, base64Data) {
-    var image = new Image();
-    image.onload = function() {
-        callback(image);
-    }
-    image.src = base64Data;
-}
-// Parses through the resulting image looking for 10 by 10 pixels containing magenta,
-// indicating a mismatch, and returns tiles with those mismatches
-function callback(image) {
-    for (let i = 0; i < image.width - 17; i += 10) {
-        for (let j = 0; j < image.height; j += 10) {
-            var canvas = document.createElement('canvas');
-            canvas.width = 10;
-            canvas.height = 10;
-            var context = canvas.getContext('2d');
-            context.drawImage(image, i, j, 10, 10, 0, 0, canvas.width, canvas.height);
-            var pixels = context.getImageData(0, 0, canvas.width, canvas.height)
-            for (let k = 0; k < pixels['data'].length; k += 4) {
-                if (pixels['data'][k] == 255 && pixels['data'][k+1] == 0 && pixels['data'][k+2] == 255) {
-                    // tiles.push([j/10, i/10]);
-                    document.getElementById(j/10 + " " + i/10).style.background = "rgba(224, 0, 0, 0.37)"; 
-                    break
-                }
-            }
-        }
-    }
 }
