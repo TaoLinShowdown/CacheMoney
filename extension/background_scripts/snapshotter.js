@@ -53,7 +53,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
                 var newImg = dataURL;
                 if(oldImg !== newImg) {
                     console.log("MAKING COMPARISON...")
-                    chrome.tabs.sendMessage(tabId, {message: "RESEMBLE", img1: newImg, img2: oldImg}, function(response) {
+                    chrome.tabs.sendMessage(tabId, {message: "RESEMBLE", img1: oldImg, img2: newImg}, function(response) {
                         console.log(response.handshake);
                     });
                 }
@@ -73,6 +73,7 @@ chrome.tabs.onRemoved.addListener(function(tabId, changeInfo, tab) {
  * On message received from screenshot.js
  * Request has url to be reported and logged in MongoDB
  * Make HTTP request to send url using XMLHttpRequest()
+ * Also make HTTP request to update our list of reported URLs
  */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     var { url } = request;
@@ -82,10 +83,27 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     xhr.onreadystatechange = function() {
         if(xhr.readyState == 4 && xhr.status == 200){
             console.log("REPORTED URL:" + url);
+            var xhr2 = new XMLHttpRequest();
+            xhr2.open("GET", "http://54.234.84.123:3000/url", true);
+            xhr2.onreadystatechange = function(){
+                if(xhr2.readyState == 4 && xhr2.status == 200){
+                    chrome.storage.local.set({"dbstorage": xhr2.responseText}, function(){
+                        if(chrome.runtime.error){
+                            console.log("Runtime error");
+                        }
+                        else{
+                            console.log("Storage updated.");
+                        }
+                    });
+                }
+            };
+            xhr2.send();
         }
     }
     xhr.send("url=" + url);
     sendResponse({response: "HTTP SENT"})
+
+    
 });
 
 /**************************************************************************************** */
