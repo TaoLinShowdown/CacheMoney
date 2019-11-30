@@ -87,7 +87,7 @@ var makeDialog = function() {
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if(request.message === "RESEMBLE") {
-        if(!document.getElementById("tabnab-overlay")){
+        if(document.getElementById("tabnab-overlay") !== undefined){
             sendResponse({handshake: "PLEASE WAIT A FEW MINUTES..."});
             var { img1, img2 } = request;
 
@@ -100,7 +100,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             compareImages(img1, img2);
 
         } else {
-            console.log("PLEASE ANSWER THE CURRENT PROMPT FIRST");
+            console.log("THERE ALREADY EXISTS AN OVERLAY...");
         }
     } 
 });

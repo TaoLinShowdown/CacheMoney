@@ -38,7 +38,8 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
                 var oldImg = tabDataStore['tab_' + tabId].img;
                 var newImg = dataURL;
                 if(oldImg !== newImg) {
-                    chrome.tabs.sendMessage(tabId, {message: "RESEMBLE", img1: oldImg, img2: newImg}, function(response) {
+                    console.log("MAKING COMPARISON")
+                    chrome.tabs.sendMessage(tabId, {message: "RESEMBLE", img1: newImg, img2: oldImg}, function(response) {
                         console.log(response.handshake);
                     });
                 }
