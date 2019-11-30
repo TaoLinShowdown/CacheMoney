@@ -268,3 +268,35 @@ function enableScroll() {
     document.onkeydown = null;  
 }
 
+// // Takes resulting image in base64 and creates image with it
+// function splitImage(callback, base64Data) {
+//     var tiles = []
+//     var image = new Image();
+//     image.src = base64Data
+//     image.onload = function() {
+//         tiles = callback(image)
+//         console.log(tiles)
+//     }
+// }
+// // Parses through the resulting image looking for 10 by 10 pixels containing magenta,
+// // indicating a mismatch, and returns tiles with those mismatches
+// function callback(image) {
+//     var tiles = []
+//     for (let i = 0; i < image.width - 17; i += 10) {
+//         for (let j = 0; j < image.height; j += 10) {
+//             var canvas = document.createElement('canvas');
+//             canvas.width = 10;
+//             canvas.height = 10;
+//             var context = canvas.getContext('2d');
+//             context.drawImage(image, i, j, 10, 10, 0, 0, canvas.width, canvas.height);
+//             var pixels = context.getImageData(0, 0, canvas.width, canvas.height)
+//             for (let k = 0; k < pixels['data'].length; k += 4) {
+//                 if (pixels['data'][k] == 255 && pixels['data'][k+1] == 0 && pixels['data'][k+2] == 255) {
+//                     tiles.push([canvas.toDataURL(), j/10, i/10]);
+//                     break
+//                 }
+//             }
+//         }
+//     }
+//     return tiles
+// }
