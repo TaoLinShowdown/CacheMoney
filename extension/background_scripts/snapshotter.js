@@ -37,10 +37,11 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
             chrome.tabs.captureVisibleTab(null, {format: "png"}, function(dataURL) {
                 var oldImg = tabDataStore['tab_' + tabId].img;
                 var newImg = dataURL;
-
-                chrome.tabs.sendMessage(tabId, {message: "RESEMBLE", img1: oldImg, img2: newImg}, function(response) {
-                    console.log(response.handshake);
-                });
+                if(oldImg !== newImg) {
+                    chrome.tabs.sendMessage(tabId, {message: "RESEMBLE", img1: oldImg, img2: newImg}, function(response) {
+                        console.log(response.handshake);
+                    });
+                }
             })
         }
     }
