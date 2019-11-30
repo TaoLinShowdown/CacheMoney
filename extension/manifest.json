@@ -4,7 +4,7 @@
     "description": "Tabnabbing detecting by team CacheMoney",
     "permissions": ["tabs", "https://*/", "http://localhost/*", "<all_urls>", "activeTab", "alarms", "storage", "declarativeContent"],
     "background": {
-        "scripts": ["./background_scripts/snapshotter.js", "./background_scripts/url.js"],
+        "scripts": ["./background_scripts/snapshotter.js", "./background_scripts/url.js", "./background_scripts/resemble.min.js"],
         "persistent": false
     },
     "content_scripts": [
@@ -14,5 +14,6 @@
             "run_at": "document_idle"
         }
     ],
-    "manifest_version": 2
+    "manifest_version": 2,
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

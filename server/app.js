@@ -54,55 +54,5 @@ app.listen(3000, () => {
                         response.send(result);
                 });
         });
-
-        app.post("/resemble", (request, response) => {
-                console.log("RESEMBLE REQUEST");
-                console.log(request.body);
-                var { img1, img2 } = request.body;
-                var differentTiles = compareImages(img1,img2);
-                response.send(differentTiles)
-        });
     });
 })
-
-function compareImages(img1, img2) {
-        var r = require('resemblejs');
-        var image = new Image();
-        var image2 = new Image();
-        image2.onload = function() {
-            var tiles = splitImage(image)
-            var tiles2 = splitImage(image2)
-            var differentTiles = []
-            for (let i = 0; i < tiles.length; i++) {
-                var diff = resemble(tiles[i][0])
-                .compareTo(tiles2[i][0])
-                .ignoreColors()
-                .onComplete(function(data) {
-                    if (data['misMatchPercentage'] > 0) {
-                        differentTiles.push([tiles[i][1], tiles[i][2]])
-                    }
-                    if (i == tiles.length - 1) {
-                        console.log(differentTiles)
-                    }
-                });
-            }
-        }
-        image.src = img1
-        image2.src = img2
-        return differentTiles
-    }
-
-function splitImage(image) {
-        var tiles = []
-        for (let i = 0; i < image.width - 17; i += 10) {
-                for (let j = 0; j < image.height; j += 10) {
-                        var canvas = document.createElement('canvas');
-                        canvas.width = 10;
-                        canvas.height = 10;
-                        var context = canvas.getContext('2d');
-                        context.drawImage(image, i, j, 10, 10, 0, 0, canvas.width, canvas.height);
-                        tiles.push([canvas.toDataURL(), j/10, i/10]);
-                }
-        }
-        return tiles;
-}

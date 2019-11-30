@@ -86,30 +86,28 @@ var makeDialog = function() {
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log(request);
-    if(request.coords){
-        sendResponse({handshake: "Coords received"});
-        
-        disableScroll();
-        
-        var { coords } = request;
-        changes = [];
-        changes = [ ...coords ];
-        console.log("detected changes: ", changes);
+    // console.log(request);
+    sendResponse({handshake: "Coords received"});
+    
+    disableScroll();
+    
+    var { coords } = request;
+    changes = [];
+    changes = [ ...coords ];
+    console.log("detected changes: ", changes);
 
-        if(!document.getElementById("tabnab-overlay")){
-            var overlay = makeOverlay();
-            var dialog = makeDialog();
-            document.body.appendChild(overlay);
-            document.body.appendChild(dialog);
-        }
-
-        // COLORING IN THE BOXES THAT WE DETECTED CHANGE IN
-        changes.forEach((coord) => {
-            var id = coord[0] + " " + coord[1];
-            document.getElementById(id).style.background = "rgba(224, 0, 0, 0.37)";
-        });
+    if(!document.getElementById("tabnab-overlay")){
+        var overlay = makeOverlay();
+        var dialog = makeDialog();
+        document.body.appendChild(overlay);
+        document.body.appendChild(dialog);
     }
+
+    // COLORING IN THE BOXES THAT WE DETECTED CHANGE IN
+    changes.forEach((coord) => {
+        var id = coord[0] + " " + coord[1];
+        document.getElementById(id).style.background = "rgba(224, 0, 0, 0.37)";
+    });
 });
 
 // CODE FROM: https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
