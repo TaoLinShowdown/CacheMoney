@@ -1,5 +1,5 @@
 var tabDataStore = {};
-var interval = 4000;
+var interval = 1000;
 
 // THE MAIN PART WHERE WE TAKE A SNAPSHOT EVERY COUPLE SECONDS AND STORE IT LOCALLY
 var t = setInterval(function() {

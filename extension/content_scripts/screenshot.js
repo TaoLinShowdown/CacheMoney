@@ -96,48 +96,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             var dialog = makeDialog();
             document.body.appendChild(overlay);
             document.body.appendChild(dialog);
-            var image1 = new Image();
-            var image2 = new Image();
-            var images = [image1, image2];
+            
+            compareImages(img1, img2);
 
-            // checking for both images to be loaded in SOURCE: https://stackoverflow.com/questions/3032299/checking-for-multiple-images-loaded
-            var imageCount = 2;
-            var imagesLoaded = 0;
-
-            for(var i=0; i<imageCount; i++){
-                images[i].onload = function(){
-                    imagesLoaded++;
-                    if(imagesLoaded == imageCount){
-                        allLoaded();
-                    }
-                }
-            }
-
-            function allLoaded(){
-                console.log("ALL IMAGES LOADED...");
-                
-                var tiles = splitImage(image1);
-                var tiles2 = splitImage(image2);
-                var differentTiles = [];
-                for (let i = 0; i < tiles.length; i++) {
-                    var diff = resemble(tiles[i][0])
-                    .compareTo(tiles2[i][0])
-                    .ignoreColors()
-                    .onComplete(function(data) {
-                        if (data['misMatchPercentage'] > 0) {
-                            differentTiles.push([tiles[i][1], tiles[i][2]])
-                            document.getElementById(tiles[i][1] + " " + tiles[i][2]).style.background = "rgba(224, 0, 0, 0.37)";
-                            console.log("colored tile: " + tiles[i][1] + " " + tiles[i][2]);
-                        }
-                        if (i == tiles.length - 1) {
-                            console.log(differentTiles)
-                        }
-                    });
-                }
-            }
-
-            image1.src = img1;
-            image2.src = img2;
         } else {
             console.log("PLEASE ANSWER THE CURRENT PROMPT FIRST");
         }
@@ -246,46 +207,43 @@ function enableScroll() {
     document.onkeydown = null;  
 }
 
-// // Takes two images' base64 code, outputs the resulting image, and runs splitImage
-//         // through the resulting image to get the coordinates
-//         function compareImages(image1base64, image2base64) {
-//             resemble(image1base64)
-//             .compareTo(image2base64)
-//             .ignoreColors()
-//             .onComplete(function(data) {
-//                 var output = data.getImageDataUrl();
-//                 splitImage(callback, output)
-//             });
-//         }
-// // Takes resulting image in base64 and creates image with it
-// function splitImage(callback, base64Data) {
-//     var tiles = []
-//     var image = new Image();
-//     image.onload = function() {
-//         tiles = callback(image)
-//         console.log(tiles)
-//     }
-//     image.src = base64Data
-// }
-// // Parses through the resulting image looking for 10 by 10 pixels containing magenta,
-// // indicating a mismatch, and returns tiles with those mismatches
-// function callback(image) {
-//     var tiles = []
-//     for (let i = 0; i < image.width - 17; i += 10) {
-//         for (let j = 0; j < image.height; j += 10) {
-//             var canvas = document.createElement('canvas');
-//             canvas.width = 10;
-//             canvas.height = 10;
-//             var context = canvas.getContext('2d');
-//             context.drawImage(image, i, j, 10, 10, 0, 0, canvas.width, canvas.height);
-//             var pixels = context.getImageData(0, 0, canvas.width, canvas.height)
-//             for (let k = 0; k < pixels['data'].length; k += 4) {
-//                 if (pixels['data'][k] == 255 && pixels['data'][k+1] == 0 && pixels['data'][k+2] == 255) {
-//                     tiles.push([j/10, i/10]);
-//                     break
-//                 }
-//             }
-//         }
-//     }
-//     return tiles
-// }
+// Takes two images' base64 code, outputs the resulting image, and runs splitImage
+// through the resulting image to get the coordinates
+function compareImages(image1base64, image2base64) {
+    resemble(image1base64)
+    .compareTo(image2base64)
+    .ignoreColors()
+    .onComplete(function(data) {
+        var output = data.getImageDataUrl();
+        splitImage(callback, output)
+    });
+}
+// Takes resulting image in base64 and creates image with it
+function splitImage(callback, base64Data) {
+    var image = new Image();
+    image.onload = function() {
+        callback(image);
+    }
+    image.src = base64Data;
+}
+// Parses through the resulting image looking for 10 by 10 pixels containing magenta,
+// indicating a mismatch, and returns tiles with those mismatches
+function callback(image) {
+    for (let i = 0; i < image.width - 17; i += 10) {
+        for (let j = 0; j < image.height; j += 10) {
+            var canvas = document.createElement('canvas');
+            canvas.width = 10;
+            canvas.height = 10;
+            var context = canvas.getContext('2d');
+            context.drawImage(image, i, j, 10, 10, 0, 0, canvas.width, canvas.height);
+            var pixels = context.getImageData(0, 0, canvas.width, canvas.height)
+            for (let k = 0; k < pixels['data'].length; k += 4) {
+                if (pixels['data'][k] == 255 && pixels['data'][k+1] == 0 && pixels['data'][k+2] == 255) {
+                    // tiles.push([j/10, i/10]);
+                    document.getElementById(j/10 + " " + i/10).style.background = "rgba(224, 0, 0, 0.37)"; 
+                    break
+                }
+            }
+        }
+    }
+}
