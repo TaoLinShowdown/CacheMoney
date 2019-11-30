@@ -246,6 +246,17 @@ function enableScroll() {
     document.onkeydown = null;  
 }
 
+// // Takes two images' base64 code, outputs the resulting image, and runs splitImage
+//         // through the resulting image to get the coordinates
+//         function compareImages(image1base64, image2base64) {
+//             resemble(image1base64)
+//             .compareTo(image2base64)
+//             .ignoreColors()
+//             .onComplete(function(data) {
+//                 var output = data.getImageDataUrl();
+//                 splitImage(callback, output)
+//             });
+//         }
 // // Takes resulting image in base64 and creates image with it
 // function splitImage(callback, base64Data) {
 //     var tiles = []
