@@ -83,21 +83,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     xhr.onreadystatechange = function() {
         if(xhr.readyState == 4 && xhr.status == 200){
             console.log("REPORTED URL:" + url);
-            var xhr2 = new XMLHttpRequest();
-            xhr2.open("GET", "http://54.234.84.123:3000/url", true);
-            xhr2.onreadystatechange = function(){
-                if(xhr2.readyState == 4 && xhr2.status == 200){
-                    chrome.storage.local.set({"dbstorage": xhr2.responseText}, function(){
-                        if(chrome.runtime.error){
-                            console.log("Runtime error");
-                        }
-                        else{
-                            console.log("Storage updated.");
-                        }
-                    });
+            chrome.storage.local.set({"dbstorage": xhr.responseText}, function(){
+                if(chrome.runtime.error){
+                    console.log("Runtime error");
                 }
-            };
-            xhr2.send();
+                else{
+                    console.log("Storage updated.");
+                }
+            });
         }
     }
     xhr.send("url=" + url);
