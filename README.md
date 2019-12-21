@@ -13,3 +13,5 @@ Travis Li
 2. In the Chrome browser go to `chrome://extensions/`
 3. In the top right of the page enable developer mode, then in the top right click load unpacked
 4. Select the extensions folder from this repo
+
+#### For more info read `CacheMoney_Report.pdf`
